@@ -1,0 +1,346 @@
+## Introduction `r if(rmarkdown::metadata$version=='professeur') "~ 10 min."`
+
+Les premières sections de cette introduction sont fortement inspirée du chapitre introductif de Munzner (2014).
+
+### La visualisation de données, une représentation _visuelle_
+
+La visualisation repose sur la vision car c'est le sens le plus adapté comme support de mémoire externe:
+
+- \dotfill
+- \dotfill
+- \dotfill
+- \dotfill
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> parallélisation inconsciente du traitement ; perception simmultanée ; zones cérébrales spécialisées et développées ; possibilité technique (écrans, imprimerie)"
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+### Une représentation _complexe_
+
+La visualisation présente des données les plus désagrégées possibles, pour ne pas tomber dans le piège de la synthèse (**Figure 1**).
+
+![**Le piège de la synthèse.** Le quartet d'Anscombe est cet ensemble de quatre droites de régression identiques, bien que construites sur des données très différentes. La visualisation permet de proposer simmulaténement une lecture agrégée et désagrégée des données. **Source de l'image:** Wikipédia](img/quartet-anscombe.png)
+
+Ce n'est évidemment pas toujours possible quand les données deviennent beaucoup trop nombreuses. Mais l'idée est d'utiliser les avantages de la vision pour transmettre beaucoup plus d'information que ce qu'il est possible de proprement _comprendre_.
+
+### Une représentation _efficace_
+
+La visualisation se distingue du design, de la publicité ou de l'art par \dotfill \newline .\dotfill \newline .\dotfill
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> ... son intérêt pour l'efficacité de la représentation à communiquer une information ; nous ne poserons donc pas la question de savoir si un graphique est "joli" mais de s'il "fonctionne".
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+Malheureusement \dotfill \newline .\dotfill \newline .\dotfill
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> ... la notion d'efficacité est très floue, et dépend des tâches envisagées. Et les tâches possibles sont très nombreuses. S'agit-il de marquer l'esprit? (provoquer l'arrête d'un passant ; placer une information en mémoire du lecteur pour le plus longtemps possible) De lire précisément un chiffre? (minimiser l'erreur de lecture) De favoriser l'amusement et la découverte? (garder un utilisateur captif le plus longtemps possible, maximiser son bien-être ressenti) Etc. Parfois, il est même très malaisé de définir un objectif mesurable, comme lorsque les graphiques nous servent à écouvrir des régularités précédemment inconnues, de détecter des tendances, etc.
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+Dans ce cours, nous nous intéresserons surtout à \dotfill \newline .\dotfill \newline .\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> ... la tâche de comparer des grandeurs dans des graphiques finis, c'est-à-dire publiables. D'un côté parce que la comparaison est une tâche fondamentale (elle conditionne, par exemple, la découverte de régularités). De l'autre parce que c'est l'une de plus étudiées.
+> 
+> Cela laisse malheureusement un immense pan du travail du statisticien, les graphiques à des fins d'exploration, qui n'est que très peu étudiée. (Cependant, connaître les conditions d'une d'une comparaison visuellement efficace nous aide déjà énormément dans cette tâche.)
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+Mais même avec une tâche précise et avec une bonne définition de "l'efficacité" d'une visualisation pour cette tâche, il est extrêmement difficile/fastidieux de "valider" une visualisation. Aussi, les informations expérimentales sur la visualisation sont plutôt rares.
+
+### Une représentation subjective
+
+\dotfill \newline .\dotfill \newline .\dotfill \newline .\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> Malgré sa focale sur l'efficacité, il est illusoire de penser que la visualisation est exempte de tout biais, puisque la critique montre que même des disciplines aussi "objectives" que la photographie et la cartographie sont tout autant des propositions que des descriptions (le photographe choisit quoi mettre de dans le cadre, le cartographe une projection, des figurés, etc.).
+
+> Dans ce cours, je vous propose d'assumer constamment votre subjectivité, notamment en choissant des titres clairs et qui véhiculent un message, plutôt que de vous cacher derrière une objectivité en toc.
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+### `ggplot` et `tidyverse`
+
+Nous utiliserons dans ce cours la bibliothèque `ggplot2`, inspiré de _The Grammar of Graphics_ (Wilkinson, 2005), qui permet de réaliser des graphiques d'une étonnante richesse, tout en gardant un code clair.
+
+Cette bibliothèque fait partie de la série de bibliothèques `tidyverse`, maintenue et développée les programmeurs de RStudio, au premier rang desquels Hadley Wickham. Ces bibliothèques rendent plus cohérentes de nombreuses fonctionsde R-base, qui fonctionnaient jusqu'alors selon chacune leur logique propre. La plupart étant transparentes pour l'utilisateur, je les utilise sans le mentionner explicitement. Mais n'hésitez pas à me poser des questions sur des fonctions qui vous sont inconnues.
+
+La seule nouveauté sur laquelle je vais insister dès maintenant, c'est la notation `%>%` (aka _pipe_), qui permet de remplacer:
+
+- `f(x)` par `x %>% f` et
+- `f(x,a)` par `x %>% f(a)`.
+
+Cela paraît un peu ridicule à premier abord (c'est plus long!), mais cela permet de faire de très longues chaînes de fonctions qui, si les fonctions ont été pensées pour, sont très lisibles.
+
+Par exemple `paste0(rev(toupper(letters)), collapse='')` devient:
+
+`letters %>% .......................................................`
+
+`r if(rmarkdown::metadata$version!='professeur') "\\begin{comment}"`
+> `letters %>% str_to_upper %>% rev %>% str_c(collapse='')`
+> 
+> 1. C'est plus conforme à l'ordre logique.
+> 2. Notez les fonctions `str_...` de la bibliothèque `tidyverse` qui remplacent toutes les fonctions ayant trait aux chaînes de caractères.
+`r if(rmarkdown::metadata$version!='professeur') "\\end{comment}"`
+
+### Les données
+
+Nous travaillerons avec des données Eurostat, principalement des données de population au niveau NUTS 2 (le découpage officiel statistique européeen, qui possède 3 niveaux). Le tableau de données `NUTS2_year` possède une ligne par région NUTS 2 et par année d'observation:
+
+```{r, echo=FALSE}
+load('data/NUTS2_year.RData')
+NUTS2_year
+```
+
+## 1. Faire un graphique avec `ggplot2` `r if(rmarkdown::metadata$version=='professeur') "~ 15 min."`
+
+### 1.1 Graphique basique
+
+Commençons par un exemple: l'évolution de la population en Champagne-Ardenne et en Picardie entre 1990 et 2015.
+
+```{r 1-1-graphique-basique, echo=TRUE}
+NUTS2_year %>%
+  filter(nom %in% c('Champagne-Ardenne', 'Picardie')) %>%
+  ggplot(aes(x=année, y=population)) +
+  geom_line(aes(group=nom))
+```
+
+Le code du plus simple graphique `ggplot2` possède trois parties:
+
+1. `data %>% ggplot(...)`: \dotfill
+    
+    `r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+    > J'appelle la fonction `ggplot()` sur les données.
+    > La fonction `ggplot()` seule ne produit pas de graphiques, mais crée un objet `ggplot`.
+    `r if(rmarkdown::metadata$version!='professeur') "-->"`
+    
+    Notez que `data %>% ggplot(...)` est la même chose que `ggplot(data, ...)`, mais cela est plus lisible quand comme ici je transforme mes données à la vollée avec `filter`. Ainsi:
+    ```{r, eval=FALSE, echo=TRUE}
+    NUTS2_year %>% filter(nom %in% c('Champagne-Ardenne', 'Picardie')) %>% ggplot
+    ```
+    ... est l'équivalent en R-base de:
+    ```{r, eval=FALSE, echo=TRUE}
+    ggplot(............................................................................)
+    ```
+    `r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+    > ```{r, eval=FALSE, echo=TRUE}
+    > ggplot(NUTS2_year[NUTS2_year$nom %in% c('Champagne-Ardenne', 'Picardie'), ])
+    > ```
+    `r if(rmarkdown::metadata$version!='professeur') "-->"`
+    
+2. `aes(...)`: \dotfill
+    
+    `r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+    > La fonction `aes()` — comme _æsthetics_ — permet de préciser quelles variables vont être utilisées dans la production du graphique, et quels paramètres (position, forme, couleur, etc.) vont dépendre de quelles variables.
+    > Ici, les années seront en abscisse (`x=année`), la population en ordonnée (`y=population`).
+    > `aes()` peut-être spécifiée dans la fonction `ggplot()` mais aussi individuellement pour chaque couche.
+    `r if(rmarkdown::metadata$version!='professeur') "-->"`
+    
+    Les paramètres graphiques spécifiés dans `ggplot()` sont valables pour **tout** le graphique.
+    
+3. `geom_...(...)`: \dotfill
+    
+    `r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+    > Enfin, j'ajoute à l'_objet_ `ggplot` issu de la _fonction_ `ggplot()` une fonction qui, elle, va indiquer quel type de graphique produire. Une telle fonction commence généralement par le préfixe `geom_...`, et je la sépare de l'appel à la fonction `ggplot()` par un `+`.
+    > Ici, les années seront en abscisse (`x=année`), la population en ordonnée (`y=population`).
+    > `aes()` peut-être spécifiée dans la fonction `ggplot()` mais aussi individuellement pour chaque couche.
+    `r if(rmarkdown::metadata$version!='professeur') "-->"`
+    
+    Chaque fonction `geom_...` produit une nouvelle couche (_layer_) contenant les figures (_geometries_) indiquées par le suffixe de la fonction. Ici, `geom_line` produit des lignes (_lines_). Les fonctions graphiques réutilisent les paramètres fournis dans l'argument `aes()` de la fonction `ggplot()`, ici les coordonnées `x=année` et `y=population`. Mais chaque couche peut avoir en sus ses propres paramètres graphiques additionnels. Ici, tous les points correspondant à une même région NUTS 2 (`group=nom`) seront reliés entre eux par des segments, constituant ainsi une ligne.
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+> **Commentaires à l'oral selon besoin:**
+> 
+> - Comme la fonction `plot`, la fonction `ggplot` s'utilise avec des données au format long, où chaque ligne correspond à une observation. Par exemple, si je télécharge un tableau du chômage avec des pays en ligne, et des années en colonne, il faut reformater les données pour avoir une colonne "pays" et une colonne "année" et enfin une colonne "chômage" avant de pouvoir la représenter.
+> - Le verbe `filter` sert à filter les données en sélectionnant les observations. (En cela, il est complémentaire du verbe `select` qui permet, lui, de filtrer les colonnes.)
+> - Il ne faut pas oublier les parenthèses dans `geom_line()`, même quand on ne donne pas de paramètres, car il s'agit bien d'une fonction!
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+
+
+## 4. Synthèse `r if(rmarkdown::metadata$version=='professeur') "~ 10 min."`
+
+Il n'y a pas unanimité entre les chercheurs en sciences cognitives sur la hiérarchie des vecteurs de représentation, pour les variables quantitatives et qualitatives. (Et encore moins sur des variables moins communes comme les variables discrètes ordonnées.) Néanmoins, il se dégage des lignes générales.
+
+### 4.1. Variables quantitatives continues
+
+Pour les variables quantitatives continues, retenons la hiérarchie suivante:
+
+1. Position
+2. Longueur
+3. Superficie
+
+Les vecteurs _pente_ et _angle_ ont une efficacité variable (du même niveau que les longueurs à pire que la superficie) et le vecteur _couleur_ est au mieux du même niveau de précision que la superficie. Le _volume_ arrive en dernier.
+
+La **précision** d'un cannal de représentation est sa capacité à être perçu sans interférence par le système nerveux. Par exemple, seule la longueur est perçue de façon proportionnelle à son support physique (un segment deux fois plus long sur le papier est perçu comme deux fois plus long). En revanche la _profondeur_ et la _luminosité_ (couleur) sont perçues plus faiblement, et la _saturation_ (couleur) plus fortement que leur contre-partie mesurable respective.
+
+### 4.2. Variables qualitatives discrètes
+
+Pour les variables qualitatives discrètes, la hiérarchie est différente:
+
+1. Encadrement
+2. Connexion
+3. Proximité
+4. Couleur
+5. Forme
+
+Évidemment, il n'est possible d'encadrer qu'un nombre très restreint d'objet sur un graphique. Ce canal est donc limité à des cas avec un nombre limité de données et de catégories: c'est le diagramme de Venn. En revanche, la connexion est largement utilisé, sous la forme classique du diagramme en ligne. En l'absence de toute connection, la proximité des marqueurs est naturellement perçus comme une variable catégorielle.
+
+La _saillance_ (en anglais _pop-out_) est la capacité de certains cannaux à singulariser un petit nombre de marqueurs. Tous les canaux de sont pas égaux: il est quai-immédiat d'identifier un marqueur de couleur parmi des marqueurs noirs, ou, dans un contexte interactif, un marqueur agité d'un moubement parmi des marqueurs statiques.
+
+### 4.3. Autres considérations
+
+La **redondance** de plusieurs vecteurs améliore grandement l'efficacité. Par exemple (position+longueur+superficie) est la combinaison la plus efficace connue, avec le diagramme en barres. Le diagramme de pentes, qui utilise la combinaison (pente+position), est lui-aussi très efficace.
+
+Il y a **interférence** (_channel interference_) lorsque certains canaux se parasitent mutuellement. Si je décide d'utiliser à la fois la taille d'un marqueur (sa _superficie_) et sa _couleur_, les objets plus gros auront l'air d'avoir une couleur plus vive, par contraste avec le fond. Des canaux qui n'interfèrent pas sont dit **séparables** (les coordonnées x et y, par exemple) et des canaux dont l'interférence est complète sont dit **intégrés** (par exemples les canaux rouge, bleu et vert dans le modèle de couleur RGB).
+
+La **distinguabilité** (_discriminability_) d'un canal est d'autant plus grande que l'œil peut discerner de niveaux séparés sur ce canal. Par exemple la largeur d'une ligne a une faible distinguabilité, car à partir d'un certain moment, c'est la superficie du rectangle qui prend le pas sur la largeur du trait. En revanche, la longueur, la position, la couleur.. permettent chacun à l'œil de distinguer plus d'une centaine de valeurs.
+
+## 5. Critiquer un graphique `r if(rmarkdown::metadata$version=='professeur') "~ 30 min."`
+
+### 5.1. Introduction
+
+Nous allons maintenant réutiliser nos connaissances pour critiquer des graphiques trouvés au fil de mes lectures. Certains sont particulièrement mauvais, d'autres particulièrement réussis. Le but de ces 3 séances de 30 min est d'apprendre à critiquer un graphique de façon structurée, en réutilisant les notions découvertes.
+
+1) N'hésitez pas à me faire suivre des graphiques que vous trouvez particulièrement intéressants (peu importe si c'est parce qu'ils posent problème ou non)
+2) À la fin des deux premières séances, je vous propose un graphique à critiquer et, surtout, à reproduire avec `ggplot2` en deux versions: une version identique et, surtout, une version améliorée pour tenir compte des critiques. Nous corrigerons ces graphiques à la séance suivante. (Le partiel consiste en une telle critique—reproduction d'un graphique par groupe de 2 élèves.)
+
+### 5.2 Principes
+
+Pour structurer nos critiques, nous utiliserons le « [_Trifeca Checkup_](https://junkcharts.typepad.com/junk_charts/junk-charts-trifecta-checkup-the-definitive-guide.html) » développé par [Kaiser Fung]() sur sont blog _Junk Charts_, après plusieurs années de critique quotidienne. En effet, il ne suffit pas de dire qu'un graphique « n'est pas joli » ou « ne fonctionne pas » pour que cela constitue une critique pertinente, à même de permettre aux auteurs de proposer de meilleures alternatives. Notez bien que, de toute façon, **nous ne jugeons pas ici de la qualité esthétique du graphique**, ce qui est en dehors de nos compétences, en plus d'être extrêmement subjectif.
+
+Le _Trifeca Checkup_ s'articule autour de trois questions:
+
+- la question à laquelle répond le graphe est-elle claire? (Q)
+- les données mobilisées permettent-elles de répondre à la question posée? (D)
+- la représentation visuelle choisie utilise-t-elle correctement les données pour répondre à la question? (V)
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`
+> Le graphique idéal combine une question claire (Q) et des données (D) et un visuel (V) adaptés. C'est hélas loin d'être le cas.
+> 
+> Autres questions critiques à évoquer, qui ne rentrent pas vraiment dans le Trifeca Checkup:
+> 
+> - Est-ce que le message du graphique est clair?
+> - Si le message n'est pas immédait, est-ce que sa lecture nous est facilitée? Y a-t-il des commentaires pour aider la lecture, es annotations?
+> - Le graphique est-t-il autosuffisant? (Souvent, l'auteur porte les donnéees elles-mêmes sur le graphique. Ce n'est pas un problème — cela aide parfois la lecture d'une valeur particulière — mais le graphique ne doit pas dépendre de ces annotations pour fonctionner.)
+> - Le graphique est-il adapté à l'audience ou au medium de publication? (longs graphiques pour le web, graphique photococipable pour l'impression, simple pour le grand public, plus technique pour des revues scientifiques, etc.)
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+
+\pagebreak
+
+### 5.3 Exemples
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`
+> **À chaque fois, faire réagir les élèves:**
+> 
+> a. Quelle est la question posée? (Q)
+> b. Quelles données sont mobilisées? (D)
+> c. Le visuel est-il fidèle aux donnéees? (V)
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+
+**Exemple 1**  
+![](img/average-number-of-big.jpg){width=300px}
+
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+> **Éléments de correction:**
+> Il s'agit d'un graphique nul. Un graphique nul n'a pas de but clair, mobilise des données inadéquates ou de mauvaise qualité et utilise une représentation absconse.
+> 
+> a. La question n'est pas claire. La question la plus probable (À quel moment utilise-t-on le plus les vélos de la ville?) amène une réponse inintéressante (Pendant la journée et surtout aux heures de points.)
+> b. Les données sont douteuses. Un échantillon de deux jours pendant l'automne? De quoi est-ce représentatif? Et si les deux jours sont des lundis?
+> c. Le visuel est catastrophique. Les éléments graphiques ne passent pas le test d'autosuffisance (pas d'axe des ordonnées), les points bleus et les immeuble jaunes en arrière-plan distraient de la courbe elle-même et, surtout, l'échelle n'a aucun sens!
+
+Le même graphique, avec l'échelle:  
+![](img/average-number-of-2.png){width=400px}
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+
+**Exemple 2**  
+![](img/arctic-death-spiral.jpg){width=400px}
+
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+> Un graphique QD pêche par une visuel inadapté. C'est le type de graphique qui intéresse le plus les critiques, car il est alors possible de proposer une visualisation alternative.
+> 
+> **Éléments de correction:**
+> 
+a. L'auteur a un message fort et précis (la diminution du volume de glace).
+> b. Les données semblent fiables. Il est même possible de les télécharger.
+> c. Par contre, le visuel est inadapté. Comme nous l'avons vu, l'oeil humain est très mauvais pour mesurer les angles, alors qu'il est très bon pour percevoir les positions (verticalement ou horizontalement) et relativement meilleur à percevoir les changements de pente (au contraire, ici, les comparaisons de pente sont sans intérêt). La seule justification d'un graphique en étoile est un éventuel cycle, qui aurait pu être présent ici (les mois se répètent, avec des motifs similaires) mais n'a pas été exploité. L'intention de l'auteur est sans doute de faire se rejoindre les bouts des lignes pour souligner la diminution sur le long terme, mais d'autres moyens s'offraient à lui pour cela. De plus, 12 couleurs approche la limite de nos capacités perceptives! Alternatives: 1 graphe en étoile où 1 axe = 1 mois ; 1 heatmap avec les mois en ligne et les années en colonne ; 1 graphique en lignes (mais toujours le problème des couleurs).
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+\pagebreak
+
+**Exemple 3** ([source](https://junkcharts.typepad.com/junk_charts/2014/05/the-index-of-an-index-is-confusion.html))  
+![](img/cost-for-americans.png){width=450px}
+
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`  > 
+> Un graphique QV utilise des données dont la pertinence fait question. « _Typically the data only tangentially concern the topic, or certain adjustments are wanting, or there is a quality concern._ »
+> 
+> **Éléments de correction:**
+> 
+> Faire remarquer que le graphique est clairement destiné au web, par son format long, qui est destiné à être scrollé. La narration (_story-telling_) est organisée verticalement pour accompagner le lecteur vers le bas de l'image.
+>
+> a. L'auteur a un message fort et précis (les prix de tous les biens ne varient pas comme l'inflation, certains augmentent plus rapidement que d'autres => lesquels?). De nombreux commentaires nous permettent de bien saisir les enjeux. La graphique est correctement scénarisé (_storry-telling_).
+> b. Les données semblent fiables MAIS le traitement des données est trop poussé, ce qui fait que que ce qui est représentée est plus très clair. Par exemple, que veut dire que le prix des téléviseurs a baissé de plus 100%? Le message ("have plummetted relative to other prices") ne nous aide que modérément.
+> c. Le visuel est, en revanche, adapté. Les lignes sont standardisées à 0 en 2006, pour bien mettre en lumière les divergences (qui sont lisibles à la fois par la pente et par la position). La couleur souligne les prix qui augmentent plus vite / moins vite que la moyenne.
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+\pagebreak
+
+**Exemple 4** ([source](https://junkcharts.typepad.com/junk_charts/2014/02/small-multiples-with-simple-axes.html))  
+![](img/the-average-consumption-of-liquor.png){width=400px}
+
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+
+ `r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+> 
+> Un graphique DV ne répond pas à un problème précis. « [_T_]_he effort fails because of a poorly defined objective, or an unengaging premise._ »
+> 
+> **Éléments de correction:**
+> 
+> a. Il n'y a pas de question claire, pas de message. Il y aurait de nombreuses questions à poser, mais le graphique ne privilégie aucun angle d'attaque.
+> b. Les données sont correctement sourcées. Reste à savoir si je me fie ou non à _Euromonitor_.
+> c. Le visuel est, bien étudié:
+>     - Les _small-multiples_ (nous verrons ça plus tard) sont bien adaptés à comparer des motifs de ligne entre eux.
+>     - Contrairement à l'usage, l'auteur n'a pas jugé bon — et à raison — de placer la consommation sur une carte, car il n'y a pas de motif géographique en jeu.
+>     - Les pays sont triés de plus grand consommateur au plus petit (et non alphabétiquement).
+>     - Les étiquettes des axes ne sont pas répétées inutilement.
+>     - Effacement de l'axe des y (qui ne correspond à rien, contrairement à l'axe des x = consommation nulle).
+>     - Axe de y différent pour la Corée, qui est une valeur extrême (_outlier_)
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
+
+**Exemple 5** ([source](https://junkcharts.typepad.com/junk_charts/2014/05/how-effective-visualization-brings-data-alive.html))  
+![](img/carbon-beverage.jpg){width=400px}
+
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+.\dotfill \newline
+
+`r if(rmarkdown::metadata$version!='professeur') "<!--"`  
+> Le graphique QVD est objectivement parfait. La questions posée, les donnée, le visuel, tout se répond harmonieusement.
+> 
+> - Le graphique n'est pas nécessairement "beau"! Mais l'habillage du graphique pour le rendre plaisant à l'oeil n'est pas du ressort de l'ingénieur statisticien. C'est par exemple une question d'identité visuelle avec le reste des contenus d'une publication, etc.
+> - Les données ont été lisées pour faire apparaître des motifs spatiaux interprétables. Le graphiques avec des points aurait été moins facile à lire.
+> - Le dimension spatiale est ici essentielle. (Dans d'autres cas, ce n'est pas le cas, par exemple avec une prononciation bourgeoise vs. populaire.)
+> - La relation couleur <-> données n'est pas explicitée.
+`r if(rmarkdown::metadata$version!='professeur') "-->"`
